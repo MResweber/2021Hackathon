@@ -5,11 +5,11 @@ CFLAGS = -Wall
 
 #default: Delver
 
-Delver: game.o screen.o
-	$(CC) $(CFLAGS) -o Delver game.o screen.o -lncurses
+Delver: main.o screen.o
+	$(CC) $(CFLAGS) -o Delver main.o screen.o -lncurses
 
-game: game.c screen.h
-	$(CC) $(CFLAGS) -c game.c
+main: main.c screen.h
+	$(CC) $(CFLAGS) -c main.c
 
 screen: screen.c screen.h
 	$(CC) $(CFLAGS) -c screen.c
