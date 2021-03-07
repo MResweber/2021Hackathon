@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "armoryscr.h": "c",
-        "stdio.h": "c",
-        "game.h": "c",
-        "mapfactory.h": "c",
-        "screen.h": "c"
-    }
-}
