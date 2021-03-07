@@ -1,9 +1,11 @@
 typedef struct {
-    int hp;
-    int sta;
-} player;
-void initGame(player *p, int x, int y);
+    int xPos;
+    int yPos;
+    int hiFive;
+} character;
+void initGame(int x, int y);
 unsigned char **getMap();
-int *getPlayerPos();
+void getPos(int c, int *info);
 char *getTile(unsigned char value, int info[]);
-void pMove (int x, int y);
+char *movec(int c, int x, int y);
+void placeCharacter(int c);

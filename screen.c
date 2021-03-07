@@ -95,10 +95,7 @@ char creatorScreen(){
             return 's';
         }
         else if(input == '5' && current == 1) {
-            player *p = malloc(sizeof(player));
-            p->hp = 10;
-            p->sta = 10;
-            initGame(p, MAP_SIZE_X, MAP_SIZE_Y);
+            initGame(MAP_SIZE_X, MAP_SIZE_Y);
             delwin(cWin);
             return 'g';
         }
@@ -127,13 +124,15 @@ char helpScreen(){
 }
 
 char gameScreen(){
+        char *msg = "";
         WINDOW *gWin;
         gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
         WINDOW *tWin;
         tWin = newwin(WINDOW_Y+5, WINDOW_X, WINDOW_Y+1, 0);
     while(1){
         unsigned char **map = getMap();
-        int *playerPos = getPlayerPos();
+        int playerPos[2];
+        getPos(0, playerPos);
         int top = 0, bottom = WINDOW_Y, left = 0, right = WINDOW_X;
         int topDif = 0, bottomDif = 0, leftDif = 0, rightDif = 0;
 
@@ -185,21 +184,8 @@ char gameScreen(){
         wattroff(gWin, COLOR_PAIR(5));
         wrefresh(gWin);
 
-        char str[5];
         wclear(tWin);
-        mvwprintw(tWin, 0, 0, "Player X: ");
-        sprintf(str, "%d", playerPos[0]);
-        wprintw(tWin, str);
-        wprintw(tWin, "  Player Y: ");
-        sprintf(str, "%d", playerPos[1]);
-        wprintw(tWin, str);
-        
-        mvwprintw(tWin, 1, 0, "Bottom: ");
-        sprintf(str, "%d", bottom);
-        wprintw(tWin, str);
-        wprintw(tWin, "  Bottom Dif: ");
-        sprintf(str, "%d", bottomDif);
-        wprintw(tWin, str);
+        mvwprintw(tWin, 0, 0, msg);
         
         wrefresh(tWin);
 
@@ -208,13 +194,13 @@ char gameScreen(){
             delwin(gWin);
             return 's';
         }
-        else if (input == '2') pMove(0, 1);   // down
-        else if (input == '3') pMove(1, 1);   // down right
-        else if (input == '1') pMove(-1, 1);  // down left
-        else if (input == '8') pMove(0, -1);  // up
-        else if (input == '9') pMove(1, -1);  // up right
-        else if (input == '7') pMove(-1, -1); // up left
-        else if (input == '6') pMove(1, 0);   // right
-        else if (input == '4') pMove(-1, 0);  // left
+        else if (input == '2') msg = movec(0, 0, 1);   // down
+        else if (input == '3') msg = movec(0, 1, 1);   // down right
+        else if (input == '1') msg = movec(0, -1, 1);  // down left
+        else if (input == '8') msg = movec(0, 0, -1);  // up
+        else if (input == '9') msg = movec(0, 1, -1);  // up right
+        else if (input == '7') msg = movec(0, -1, -1); // up left
+        else if (input == '6') msg = movec(0, 1, 0);   // right
+        else if (input == '4') msg = movec(0, -1, 0);  // left
     }
 }
