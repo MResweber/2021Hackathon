@@ -24,6 +24,10 @@ int main(int argc, char** argv) {
         case 'g': 
             state = gameScreen();
             break;
+        
+        case 'v': 
+            state = victoryScreen();
+            break;
 
         case 'e':
             exit(0);

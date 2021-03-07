@@ -18,6 +18,10 @@ void initGame(int x, int y) {
     for (int i = 1; i < 4; i++) {
         placeCharacter(i);
     }
+    pc[4] = malloc(sizeof(character));
+    pc[4]->hiFive = 0;
+    pc[4]->xPos = -10;
+    pc[4]->yPos = -10;
 }
 
 unsigned char **getMap () {
@@ -40,7 +44,7 @@ char *getTile(unsigned char value, int info[]) {
         return " ";   //Symbol
     }
     else if (value == 1) { //Open Ground
-        info[0] = 5;
+        info[0] = 1;
         info[1] = 1;
         return " ";
     }
@@ -70,6 +74,21 @@ char  *movec (int c, int x, int y){
     else if (!info[1]) {
         map[pc[c]->yPos+y][pc[c]->xPos+x] = 1;
         return "You cut through the undergrowth";
+    }
+    for (int i = 1; i < 4; i++) {
+        int wizPos[2];
+        getPos(i, wizPos);
+        if (pc[c]->xPos+x == wizPos[0] && pc[c]->yPos+y == wizPos[1]){
+            if(!pc[i]->hiFive) {
+                pc[i]->hiFive = 1;
+                return "You High Five the Wizard";
+            }
+            else return "You High Five the Wizard Again";
+        } 
+    }
+    
+    if (pc[c]->xPos+x == pc[4]->xPos && pc[c]->yPos+y == pc[4]->yPos){
+        return "You High Five the Dragon";
     }
     pc[c]->xPos+=x;
     pc[c]->yPos+=y;

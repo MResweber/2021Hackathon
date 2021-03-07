@@ -13,15 +13,14 @@
 #define WINDOW_Y 25 
 
 void createColors(){
-    init_color(COLOR_YELLOW, 300, 150, 0);
     init_color(COLOR_GREEN, 0, 300, 0);
     init_pair(1, COLOR_BLACK, COLOR_BLACK);
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
     init_pair(3, COLOR_GREEN, COLOR_GREEN);
     init_pair(4, COLOR_BLUE, COLOR_BLUE);
-    init_pair(5, COLOR_WHITE, COLOR_YELLOW);
-    init_pair(6, COLOR_RED, COLOR_YELLOW);
-    init_pair(7, COLOR_CYAN, COLOR_YELLOW);
+    init_pair(5, COLOR_WHITE, COLOR_BLACK);
+    init_pair(6, COLOR_RED, COLOR_BLACK);
+    init_pair(7, COLOR_CYAN, COLOR_BLACK);
 }
 
 void initScreen(){
@@ -128,6 +127,7 @@ char helpScreen(){
 char gameScreen(){
         char *msg = "";
         int turnCount = 0;
+        int numWiz = 3;
         WINDOW *gWin;
         gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
         WINDOW *tWin;
@@ -202,20 +202,31 @@ char gameScreen(){
                 }
             }
         }
+        int draPos[2];
+        getPos(4, draPos);
+        if(draPos[0] - left >= 0 && draPos[0] - right < right &&
+                draPos[1] - top >= 0 && draPos[1] - bottom < bottom) {
+                    wattron(gWin, COLOR_PAIR(6));
+                    mvwprintw(gWin, draPos[1]-top, draPos[0]-left, "D");
+                    wattroff(gWin, COLOR_PAIR(6));
+            }
 
 
         wrefresh(gWin);
 
         wclear(tWin);
+        char str[5];
         mvwprintw(tWin, 0, 0, msg);
         mvwprintw(tWin, 1, 0, "Number of Wizards: ");
+        sprintf(str, "%d", numWiz);
+        wprintw(tWin, str);
         mvwprintw(tWin, 2, 0, "Turn Count: ");
-        char str[5];
         sprintf(str, "%d", turnCount);
         wprintw(tWin, str);
         
         wrefresh(tWin);
 
+        msg = "";
         int input = wgetch(gWin);
         if (input == '5') {
             delwin(gWin);
@@ -230,5 +241,15 @@ char gameScreen(){
         else if (input == '6') msg = movec(0, 1, 0);   // right
         else if (input == '4') msg = movec(0, -1, 0);  // left
         turnCount++;
+        if(strcmp(msg, "You High Five the Wizard") == 0) numWiz--;
+        if(strcmp(msg, "You High Five the Dragon") == 0) return 'v';
+        if (numWiz == 0) {
+            placeCharacter(4);
+            numWiz = 1;
+        }
     }
+}
+
+char victoryScreen() {
+    return 's';
 }
