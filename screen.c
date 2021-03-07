@@ -7,10 +7,10 @@
 #include "mapFactory.h"
 #include "game.h"
 
-#define MAP_SIZE_X 1000
-#define MAP_SIZE_Y 500
-#define WINDOW_X 100
-#define WINDOW_Y 25
+#define MAP_SIZE_X 150
+#define MAP_SIZE_Y 50
+#define WINDOW_X 75 //should alwats be odd
+#define WINDOW_Y 25 
 
 void createColors(){
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
@@ -122,24 +122,79 @@ char helpScreen(){
 }
 
 char gameScreen(){
-    while(1){
         WINDOW *gWin;
         gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
+        WINDOW *tWin;
+        tWin = newwin(WINDOW_Y+5, WINDOW_X, WINDOW_Y+1, 0);
+    while(1){
         unsigned char **map = getMap();
         int *playerPos = getPlayerPos();
+        int top = 0, bottom = WINDOW_Y, left = 0, right = WINDOW_X;
+        int topDif = 0, bottomDif = 0, leftDif = 0, rightDif = 0;
+
+        int yIncrement = (WINDOW_Y - 1) / 2;
+        top = playerPos[1] - yIncrement;
+        if(top < 0) {
+            topDif = top;
+            top = 0;
+        }
+        bottom = playerPos[1] + yIncrement;
+        if(bottom > MAP_SIZE_Y) {
+            bottomDif = bottom - MAP_SIZE_Y;
+            bottom = MAP_SIZE_Y;
+        }
+
+        int xIncrement = (WINDOW_X - 1) / 2;
+        left = playerPos[0] - xIncrement;
+        if(left < 0) {
+            leftDif = left;
+            left = 0;
+        }
+        right = playerPos[0] + xIncrement;
+        if(right > MAP_SIZE_X) {
+            rightDif = right - MAP_SIZE_X;
+            right = MAP_SIZE_X;
+        }
+
+        top -= bottomDif;
+        bottom -= topDif;
+        left -= rightDif;
+        right -= leftDif;
+
         wclear(gWin);
 
-        for(int y = 0; y < MAP_SIZE_Y; y++) {
-            for(int x = 0; x < MAP_SIZE_X; x++){
+        for(int y = top; y < bottom; y++) {
+            for(int x = left; x < right; x++){
                 int color[2];
                 char *tile = getTile(map[y][x], color);
                 wattron(gWin, COLOR_PAIR(color[0]));
-                mvwprintw(gWin, y, x, tile);
+                mvwprintw(gWin, y-top, x-left, tile);
                 wattroff(gWin, COLOR_PAIR(color[0]));
             }
         }
-        mvwprintw(gWin, playerPos[1], playerPos[0], "@");
+
+        int playerTokenx = xIncrement+leftDif+rightDif;
+        int playerTokeny = yIncrement+topDif+bottomDif;
+        mvwprintw(gWin, playerTokeny, playerTokenx, "@");
         wrefresh(gWin);
+
+        char str[5];
+        wclear(tWin);
+        mvwprintw(tWin, 0, 0, "Player X: ");
+        sprintf(str, "%d", playerPos[0]);
+        wprintw(tWin, str);
+        wprintw(tWin, "  Player Y: ");
+        sprintf(str, "%d", playerPos[1]);
+        wprintw(tWin, str);
+        
+        mvwprintw(tWin, 1, 0, "Bottom: ");
+        sprintf(str, "%d", bottom);
+        wprintw(tWin, str);
+        wprintw(tWin, "  Bottom Dif: ");
+        sprintf(str, "%d", bottomDif);
+        wprintw(tWin, str);
+        
+        wrefresh(tWin);
 
         int input = wgetch(gWin);
         if (input == '5') {
