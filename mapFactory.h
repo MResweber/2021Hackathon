@@ -1,2 +1,1 @@
-
-char ***createMap(int xMax, int yMax);
+unsigned char **createMap(int xMax, int yMax);

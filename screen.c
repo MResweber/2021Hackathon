@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
 
@@ -20,6 +21,7 @@ void initScreen(){
     curs_set(FALSE);
     start_color();
     createColors();
+    keypad(stdscr, TRUE);
 }
 
 char startScreen(){
@@ -42,15 +44,15 @@ char startScreen(){
         refresh();
 
         input = getch();
-        if(input == '2') {
+        if(input == '2' || input == KEY_DOWN) {
             current++;
             if (current > 2) current = 0;
         }
-        if(input == '8') {
+        if(input == '8'|| input == KEY_UP) {
             current--;
             if (current < 0) current = 2;
         }
-        if(input == '5') {
+        if(input == '5' || input == KEY_BREAK) {
             if (current == 0) return 'n';
             if (current == 1) return 'h';
             if (current == 2) {
@@ -120,15 +122,16 @@ char gameScreen(){
     while(1){
         WINDOW *gWin;
         gWin = newwin(50, 50, 0, 0);
-        char ***map = getMap();
+        unsigned char **map = getMap();
         wclear(gWin);
 
         for(int y = 0; y < MAP_SIZE; y++) {
             for(int x = 0; x < MAP_SIZE; x++){
-                int color = atoi(&map[y][x][1]);
-                wattron(gWin, COLOR_PAIR(color));
-                mvwprintw(gWin, y, x, &map[y][x][0]);
-                wattroff(gWin, COLOR_PAIR(color));
+                int *color;
+                char *tile = getTile(map[y][x], color);
+                wattron(gWin, COLOR_PAIR(color[0]));
+                mvwprintw(gWin, y, x, tile);
+                wattroff(gWin, COLOR_PAIR(color[0]));
             }
         }
         int *playerPos = getPlayerPos();

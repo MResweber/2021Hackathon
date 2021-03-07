@@ -3,5 +3,6 @@ typedef struct {
     int sta;
 } player;
 void initGame(player *p, int x, int y);
-char ***getMap();
+unsigned char **getMap();
 int *getPlayerPos();
+char *getTile(unsigned char value, int* info);

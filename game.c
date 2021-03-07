@@ -4,7 +4,7 @@
 #include "mapFactory.h"
 #include "game.h"
 
-char ***map;
+unsigned char **map;
 player *pc;
 int playerx;
 int playery;
@@ -20,7 +20,7 @@ void initGame(player *p, int x, int y) {
     playery = 10;
 }
 
-char ***getMap () {
+unsigned char **getMap () {
     return map;
 }
 
@@ -29,4 +29,17 @@ int *getPlayerPos(){
     temp[0] = playerx;
     temp[1] = playery;
     return temp;
+}
+
+char *getTile(unsigned char value, int *info) {
+    if (value == 0) {
+        info[0] = 2;
+        info[1] = 0;
+        return "X";
+    }
+    else {
+        info[0] = 1;
+        info[1] = 1;
+        return ".";
+    }
 }

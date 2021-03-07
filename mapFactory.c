@@ -3,22 +3,16 @@
 
 #include "mapFactory.h"
 
-char ***createMap(int xMax, int yMax) {
-    char ***map = (char ***)malloc(sizeof(char *) * yMax);
+unsigned char **createMap(int xMax, int yMax) {
+    unsigned char **map = malloc(sizeof(unsigned char *) * yMax);
     for(int y = 0; y < yMax; y++) {
-        map[y] = (char **)malloc(sizeof(char) * 20);
+        map[y] = malloc(sizeof(unsigned char) * xMax);
         for(int x = 0; x < xMax; x++) {
-            if(x == 0 || y == 0) {
-                map[y][x] = malloc(sizeof(char) * 3);
-                map[y][x][0] = 'X'; //character
-                map[y][x][1] = '2'; //color
-                map[y][x][2] = '0';   //passable
+            if(x == 0 || y == 0 || x == xMax -1 || y == yMax - 1) {
+                map[y][x] = 0; //Wall
             }
             else {
-                map[y][x] = malloc(sizeof(char) * 3);
-                map[y][x][0] = '.';
-                map[y][x][1] = '2';
-                map[y][x][2] = '1';
+                map[y][x] = 1; //Floor
             }
         }
     }
