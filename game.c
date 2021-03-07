@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//#include "mapFactory.h"
 #include "game.h"
 
 unsigned char **map;
@@ -9,16 +8,17 @@ character **pc;
 int mapX;
 int mapY;
 
+// Creates game world
 void initGame(int x, int y) {
     mapX = x;
     mapY = y;
     createMap(mapX, mapY);
     pc = malloc(sizeof(character) * 5);
-    placeCharacter(0);
-    for (int i = 1; i < 4; i++) {
+    placeCharacter(0);                  // Places player
+    for (int i = 1; i < 4; i++) {       // Places wizards
         placeCharacter(i);
     }
-    pc[4] = malloc(sizeof(character));
+    pc[4] = malloc(sizeof(character));  // Hide Dragon
     pc[4]->hiFive = 0;
     pc[4]->xPos = -10;
     pc[4]->yPos = -10;
@@ -38,22 +38,22 @@ void getPos(int c, int *info){
 }
 
 char *getTile(unsigned char value, int info[]) {
-    if (value == 0) { //Empty Space
+    if (value == 0) {       //Empty Space
         info[0] = 1;  //color
         info[1] = 0;  //passable
         return " ";   //Symbol
     }
-    else if (value == 1) { //Open Ground
+    else if (value == 1) {  //Open Ground
         info[0] = 1;
         info[1] = 1;
         return " ";
     }
-    else if (value == 2) { //UnderGrowth
+    else if (value == 2) {  //UnderGrowth
         info[0] = 3;
         info[1] = 0;
         return " ";
     }
-    else if (value == 3) { //Water
+    else if (value == 3) {  //Water
         info[0] = 4;
         info[1] = 0;
         return " ";
@@ -61,6 +61,7 @@ char *getTile(unsigned char value, int info[]) {
     return "";
 }
 
+// Causes character at c to move bt x and y.
 char  *movec (int c, int x, int y){
     if(pc[c]->yPos + y > mapY-1) return "You are on the edge of the map";
     if(pc[c]->yPos + y < 0) return "You are on the edge of the map";
@@ -75,6 +76,8 @@ char  *movec (int c, int x, int y){
         map[pc[c]->yPos+y][pc[c]->xPos+x] = 1;
         return "You cut through the undergrowth";
     }
+
+    // Run into a Wizard
     for (int i = 1; i < 4; i++) {
         int wizPos[2];
         getPos(i, wizPos);
@@ -87,6 +90,7 @@ char  *movec (int c, int x, int y){
         } 
     }
     
+    // Run into Dragon
     if (pc[c]->xPos+x == pc[4]->xPos && pc[c]->yPos+y == pc[4]->yPos){
         return "You High Five the Dragon";
     }
@@ -95,6 +99,7 @@ char  *movec (int c, int x, int y){
     return "";
 }
 
+// Places character randomly into game world
 void placeCharacter(int c) {
     int placed = 0;
     while (!placed) {
@@ -110,6 +115,7 @@ void placeCharacter(int c) {
     }
 }
 
+// creates the map
 void createMap(int xMax, int yMax) {
     map = malloc(sizeof(unsigned char *) * yMax);
     for(int y = 0; y < yMax; y++) {
@@ -118,16 +124,20 @@ void createMap(int xMax, int yMax) {
             map[y][x] = 1; //Open Ground
         }
     }
-    addTiles(3, 1, 5); //add water
-    addTiles(2, 1, 6); //add undergrowth
+    addTiles(3, 5); //add water
+    addTiles(2, 6); //add undergrowth
 }
 
-void addTiles(unsigned char type, unsigned char rtype, int chance) {
+// Adds tiles of type to map. new tiles cannot replace tiles already placed only open ground.
+void addTiles(unsigned char type, int chance) {
+    // Add tiles randomly around the map
     for (int y = 0; y < mapY; y++) {
         for(int x = 0; x < mapX; x++) {
             if (rand() % 10 < chance && map[y][x] == 1) map[y][x] = type;
         }
     }
+
+    // Changes so tile cluster together
     for (int i = 0; i < 10; i++) {
         for (int y = 0; y < mapY; y++) {
             for(int x = 0; x < mapX; x++) {
@@ -142,7 +152,7 @@ void addTiles(unsigned char type, unsigned char rtype, int chance) {
                 if (x != mapX-1 && y != 0 && map[y-1][x+1]  == type) count++;
                 if (x != mapX-1 && y != mapY-1 && map[y+1][x+1]  == type) count++;
 
-                if (count < 4 && map[y][x] == type) map[y][x] = rtype;
+                if (count < 4 && map[y][x] == type) map[y][x] = 1;
                 if (count > 5 && map[y][x] == 1) map[y][x] = type;
             }
         }

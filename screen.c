@@ -1,19 +1,25 @@
+//Input and Output
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
 
-//#include "mapFactory.h"
 #include "screen.h"
 #include "game.h"
 #include "text.h"
 
 #define MAP_SIZE_X 150
 #define MAP_SIZE_Y 50
-#define WINDOW_X 75 //should alwats be odd
+#define WINDOW_X 75     // should alwats be odd
 #define WINDOW_Y 25 
 
+int turnCount = 0;
+
+// The main argument works by switching between states. Each screen handles any input or output
+// within the function, but if it needs to change which screen it is on then it just returns
+// the char corresponding to the screen it wants.
 int main(int argc, char** argv) {
     char state = 's';
     initScreen();
@@ -49,17 +55,19 @@ int main(int argc, char** argv) {
     }
 }
 
+// Initializes color pairs used by program
 void createColors(){
     init_color(COLOR_GREEN, 0, 300, 0);
-    init_pair(1, COLOR_BLACK, COLOR_BLACK);
-    init_pair(2, COLOR_BLACK, COLOR_WHITE);
-    init_pair(3, COLOR_GREEN, COLOR_GREEN);
-    init_pair(4, COLOR_BLUE, COLOR_BLUE);
-    init_pair(5, COLOR_WHITE, COLOR_BLACK);
-    init_pair(6, COLOR_RED, COLOR_BLACK);
-    init_pair(7, COLOR_CYAN, COLOR_BLACK);
+    init_pair(1, COLOR_BLACK, COLOR_BLACK); // Unused
+    init_pair(2, COLOR_BLACK, COLOR_WHITE); // Highlight
+    init_pair(3, COLOR_GREEN, COLOR_GREEN); // Undergrowth
+    init_pair(4, COLOR_BLUE, COLOR_BLUE);   // Water
+    init_pair(5, COLOR_WHITE, COLOR_BLACK); // Adventurer
+    init_pair(6, COLOR_RED, COLOR_BLACK);   // non-highfived wizards and dragons
+    init_pair(7, COLOR_CYAN, COLOR_BLACK);  // highfived wizards
 }
 
+// Initalizes setting for curses
 void initScreen(){
     initscr();
     noecho();
@@ -70,6 +78,8 @@ void initScreen(){
     keypad(stdscr, TRUE);
 }
 
+// The first screen the user sees. New game starts a new game, help shows a bad tutorial, 
+// and exit leaves the program.
 char startScreen(){
     int current = 0;
     int input = 0;
@@ -80,6 +90,7 @@ char startScreen(){
         mvprintw (2, 0, "New Game");
         mvprintw (3, 0, "Help");
         mvprintw (4, 0, "Exit");
+        mvprintw (6, 0, "Use either arrow keys or num pad to move and either z or 5 to select.");
 
         attron(COLOR_PAIR(2));
         if(current == 0) mvprintw (2, 0, "New Game");
@@ -90,18 +101,18 @@ char startScreen(){
         refresh();
 
         input = getch();
-        if(input == '2' || input == KEY_DOWN) {
+        if(input == '2' || input == KEY_DOWN) { // Move selection
             current++;
             if (current > 2) current = 0;
         }
-        if(input == '8'|| input == KEY_UP) {
+        if(input == '8'|| input == KEY_UP) {    // Move selection
             current--;
             if (current < 0) current = 2;
         }
-        if(input == '5' || input == KEY_ENTER) {
-            if (current == 0) return 'n';
-            if (current == 1) return 'h';
-            if (current == 2) {
+        if(input == '5' || input == 'z') {      // Select
+            if (current == 0) return 'n';       // New game
+            if (current == 1) return 'h';       // Help
+            if (current == 2) {                 // Exit program
                 endwin();
                 return 'e';
             }
@@ -109,6 +120,7 @@ char startScreen(){
     }
 }
 
+// Introduces the game, back returns to menu and play starts the game proper
 char creatorScreen(){
     WINDOW *cWin;
     cWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
@@ -120,6 +132,7 @@ char creatorScreen(){
         mvwprintw(cWin, 6, 0, "Back");
         mvwprintw(cWin, 6, 5, "Play");
 
+        // Highlight selected option
         wattron(cWin, COLOR_PAIR(2));
         if(current == 0) mvwprintw(cWin, 6, 0, "Back");
         else mvwprintw(cWin, 6, 5, "Play");
@@ -128,21 +141,23 @@ char creatorScreen(){
         wrefresh(cWin);
 
         input = wgetch(cWin);
-        if(input == '5' && current == 0) {
+        if(input == '5' && current == 0) {      // Return to startmenu
             delwin(cWin);
             return 's';
         }
-        else if(input == '5' && current == 1) {
+        else if(input == '5' && current == 1) { // Start game proper
             initGame(MAP_SIZE_X, MAP_SIZE_Y);
             delwin(cWin);
             return 'g';
         }
+        // Change selection
         else if((input == '4' || input == '6') && current == 0) current = 1;
         else if((input == '4' || input == '6') && current == 1) current = 0;
     }
     
 }
 
+// Provides a tutorial on how to play
 char helpScreen(){
     WINDOW *hWin;
     hWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
@@ -153,7 +168,7 @@ char helpScreen(){
         wrefresh(hWin);
 
         input = wgetch(hWin);
-        if(input == '5') {
+        if(input == '5' || input == 'z') { // Return to start
             delwin(hWin);
             return 's';
         }
@@ -161,21 +176,26 @@ char helpScreen(){
     
 }
 
+// This is the screen that the game is played on. 
 char gameScreen(){
-        char *msg = "";
-        int turnCount = 0;
-        int numWiz = 3;
-        WINDOW *gWin;
-        gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
-        WINDOW *tWin;
-        tWin = newwin(WINDOW_Y+5, WINDOW_X, WINDOW_Y+1, 0);
+    char *msg = "";
+    turnCount = 0;
+    int numWiz = 3;
+    WINDOW *gWin;
+    gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
+    WINDOW *tWin;
+    tWin = newwin(WINDOW_Y+5, WINDOW_X, WINDOW_Y+1, 0);
+
+    // Loops until user quits or game is complete
     while(1){
+        // creating some variables for the screen
         unsigned char **map = getMap();
         int playerPos[2];
         getPos(0, playerPos);
         int top = 0, bottom = WINDOW_Y, left = 0, right = WINDOW_X;
         int topDif = 0, bottomDif = 0, leftDif = 0, rightDif = 0;
 
+        // Calculates borders of the screen and the offset if needed
         int yIncrement = (WINDOW_Y - 1) / 2;
         top = playerPos[1] - yIncrement;
         if(top < 0) {
@@ -200,6 +220,7 @@ char gameScreen(){
             right = MAP_SIZE_X;
         }
 
+        // Corrects the borders
         top -= bottomDif;
         bottom -= topDif;
         left -= rightDif;
@@ -207,6 +228,7 @@ char gameScreen(){
 
         wclear(gWin);
 
+        // Print map within border
         for(int y = top; y < bottom; y++) {
             for(int x = left; x < right; x++){
                 int color[2];
@@ -256,18 +278,23 @@ char gameScreen(){
 
         wrefresh(gWin);
 
+        // Bottom info bar
         wclear(tWin);
         char str[5];
         mvwprintw(tWin, 0, 0, msg);
+
         mvwprintw(tWin, 1, 0, "Number of Wizards: ");
         sprintf(str, "%d", numWiz);
         wprintw(tWin, str);
+
+
         mvwprintw(tWin, 2, 0, "Turn Count: ");
         sprintf(str, "%d", turnCount);
         wprintw(tWin, str);
         
         wrefresh(tWin);
 
+        // Handles user input
         msg = "";
         int input = wgetch(gWin);
         if (input == '5') {
@@ -292,6 +319,7 @@ char gameScreen(){
     }
 }
 
+// Short victory screen
 char victoryScreen(){
     WINDOW *vWin;
     vWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
@@ -299,6 +327,11 @@ char victoryScreen(){
     while (1) {
         wclear(vWin);
         mvwprintw(vWin, 0, 0, VICTORY);
+
+        char str[5];
+        mvwprintw(vWin, 2, 0, "Final Turn Count: ");
+        sprintf(str, "%d", turnCount);
+        wprintw(vWin, str);
         wrefresh(vWin);
 
         input = wgetch(vWin);

@@ -1,3 +1,4 @@
+// Some defines to make printing to screen easier.
 #define INTRO "Legends range far and wide about the great dragon Iliath. They are said to dwell in an ancient forest guarded by three power ful wizards, but if one should reach them and exchange a sign of friendship with them then all of their wishes would be granted. You have found that ancient forest and now you must find and befriend the three wizards. Only then will the Dragon appear."
 #define TUTORIAL "You can either use the num pad or the arrow keys to move, however the courner keys of the numpad allow you move diagonally. The z key will send you back to the main menu. Attempting to move into the space occupied by a wizrd or a dragon will high five them. You can cut through undergrowth, but you cannot go through water at all. Try to complete the game as quickly as possible. press 5 or  z to return to main menu."
-#define VICTORY "You found the great Dragonm and all of your wishes have been granted."
+#define VICTORY "You found the great Dragonm and all of your wishes have been granted. Press 5 or z to return to the main menu."
