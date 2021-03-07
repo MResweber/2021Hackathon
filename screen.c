@@ -13,8 +13,13 @@
 #define WINDOW_Y 25 
 
 void createColors(){
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    init_color(COLOR_YELLOW, 300, 150, 0);
+    init_color(COLOR_GREEN, 0, 300, 0);
+    init_pair(1, COLOR_BLACK, COLOR_BLACK);
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
+    init_pair(3, COLOR_GREEN, COLOR_GREEN);
+    init_pair(4, COLOR_BLUE, COLOR_BLUE);
+    init_pair(5, COLOR_WHITE, COLOR_YELLOW);
 }
 
 void initScreen(){
@@ -175,7 +180,9 @@ char gameScreen(){
 
         int playerTokenx = xIncrement+leftDif+rightDif;
         int playerTokeny = yIncrement+topDif+bottomDif;
+        wattron(gWin, COLOR_PAIR(5));
         mvwprintw(gWin, playerTokeny, playerTokenx, "@");
+        wattroff(gWin, COLOR_PAIR(5));
         wrefresh(gWin);
 
         char str[5];
