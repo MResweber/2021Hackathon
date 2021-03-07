@@ -10,7 +10,7 @@
 #include "game.h"
 #include "text.h"
 
-#define MAP_SIZE_X 150
+#define MAP_SIZE_X 150  // Can be any number
 #define MAP_SIZE_Y 50
 #define WINDOW_X 75     // should alwats be odd
 #define WINDOW_Y 25 
@@ -90,7 +90,7 @@ char startScreen(){
         mvprintw (2, 0, "New Game");
         mvprintw (3, 0, "Help");
         mvprintw (4, 0, "Exit");
-        mvprintw (6, 0, "Use either arrow keys or num pad to move and either z or 5 to select.");
+        mvprintw (6, 0, "Use either arrow keys or num pad to move and z or 5 to select.");
 
         attron(COLOR_PAIR(2));
         if(current == 0) mvprintw (2, 0, "New Game");
@@ -297,7 +297,7 @@ char gameScreen(){
         // Handles user input
         msg = "";
         int input = wgetch(gWin);
-        if (input == '5') {
+        if (input == '5' || input == 'z') {
             delwin(gWin);
             return 's';
         }
@@ -316,6 +316,7 @@ char gameScreen(){
             placeCharacter(4);
             numWiz = 1;
         }
+        runChars();
     }
 }
 

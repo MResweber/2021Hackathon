@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "game.h"
 
@@ -10,6 +11,7 @@ int mapY;
 
 // Creates game world
 void initGame(int x, int y) {
+    srand(time(0));
     mapX = x;
     mapY = y;
     createMap(mapX, mapY);
@@ -156,5 +158,33 @@ void addTiles(unsigned char type, int chance) {
                 if (count > 5 && map[y][x] == 1) map[y][x] = type;
             }
         }
+    }
+}
+
+// Cuases NPCs to move
+void runChars(){
+    for (int i = 1; i < 4; i++){
+        int dir = rand() % 9;
+        //if(dir == 0) movec(i,  0,  0);
+        if(dir == 1) movec(i,  0,  1);
+        if(dir == 2) movec(i,  0, -1);
+        if(dir == 3) movec(i,  1,  0);
+        if(dir == 4) movec(i,  1,  1);
+        if(dir == 5) movec(i,  1, -1);
+        if(dir == 6) movec(i, -1,  0);
+        if(dir == 7) movec(i, -1,  1);
+        if(dir == 8) movec(i, -1, -1);
+    }
+    if(pc[4]->xPos > 0) {
+        int dir = rand() % 9;
+        if(dir == 0) movec(4,  0,  0);
+        if(dir == 1) movec(4,  0,  1);
+        if(dir == 2) movec(4,  0, -1);
+        if(dir == 3) movec(4,  1,  0);
+        if(dir == 4) movec(4,  1,  1);
+        if(dir == 5) movec(4,  1, -1);
+        if(dir == 6) movec(4, -1,  0);
+        if(dir == 7) movec(4, -1,  1);
+        if(dir == 8) movec(4, -1, -1);
     }
 }

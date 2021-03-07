@@ -12,3 +12,4 @@ void placeCharacter(int c);
 int getHiFived (int c);
 void createMap(int xMax, int yMax);
 void addTiles(unsigned char type, int chance);
+void runChars();
