@@ -15,10 +15,17 @@ void initGame(int x, int y) {
     map = createMap(mapX, mapY);
     pc = malloc(sizeof(character) * 5);
     placeCharacter(0);
+    for (int i = 1; i < 4; i++) {
+        placeCharacter(i);
+    }
 }
 
 unsigned char **getMap () {
     return map;
+}
+
+int getHiFived (int c) {
+    return pc[c]->hiFive;
 }
 
 void getPos(int c, int *info){ 

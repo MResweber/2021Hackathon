@@ -9,3 +9,4 @@ void getPos(int c, int *info);
 char *getTile(unsigned char value, int info[]);
 char *movec(int c, int x, int y);
 void placeCharacter(int c);
+int getHiFived (int c);

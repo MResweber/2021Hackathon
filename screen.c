@@ -20,6 +20,8 @@ void createColors(){
     init_pair(3, COLOR_GREEN, COLOR_GREEN);
     init_pair(4, COLOR_BLUE, COLOR_BLUE);
     init_pair(5, COLOR_WHITE, COLOR_YELLOW);
+    init_pair(6, COLOR_RED, COLOR_YELLOW);
+    init_pair(7, COLOR_CYAN, COLOR_YELLOW);
 }
 
 void initScreen(){
@@ -125,6 +127,7 @@ char helpScreen(){
 
 char gameScreen(){
         char *msg = "";
+        int turnCount = 0;
         WINDOW *gWin;
         gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
         WINDOW *tWin;
@@ -182,10 +185,34 @@ char gameScreen(){
         wattron(gWin, COLOR_PAIR(5));
         mvwprintw(gWin, playerTokeny, playerTokenx, "@");
         wattroff(gWin, COLOR_PAIR(5));
+        for (int i = 1; i < 4; i++){
+            int wizardPos[2];
+            getPos(i, wizardPos);
+            if(wizardPos[0] - left >= 0 && wizardPos[0] - right < right &&
+                    wizardPos[1] - top >= 0 && wizardPos[1] - bottom <bottom) {
+                if (getHiFived(i)) {
+                    wattron(gWin, COLOR_PAIR(7));
+                    mvwprintw(gWin, wizardPos[1]-top, wizardPos[0]-left, "W");
+                    wattroff(gWin, COLOR_PAIR(7));
+                }
+                else {
+                    wattron(gWin, COLOR_PAIR(6));
+                    mvwprintw(gWin, wizardPos[1]-top, wizardPos[0]-left, "W");
+                    wattroff(gWin, COLOR_PAIR(6));
+                }
+            }
+        }
+
+
         wrefresh(gWin);
 
         wclear(tWin);
         mvwprintw(tWin, 0, 0, msg);
+        mvwprintw(tWin, 1, 0, "Number of Wizards: ");
+        mvwprintw(tWin, 2, 0, "Turn Count: ");
+        char str[5];
+        sprintf(str, "%d", turnCount);
+        wprintw(tWin, str);
         
         wrefresh(tWin);
 
@@ -202,5 +229,6 @@ char gameScreen(){
         else if (input == '7') msg = movec(0, -1, -1); // up left
         else if (input == '6') msg = movec(0, 1, 0);   // right
         else if (input == '4') msg = movec(0, -1, 0);  // left
+        turnCount++;
     }
 }
