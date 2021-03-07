@@ -31,7 +31,7 @@ int *getPlayerPos(){
     return temp;
 }
 
-char *getTile(unsigned char value, int *info) {
+char *getTile(unsigned char value, int info[]) {
     if (value == 0) {
         info[0] = 2;
         info[1] = 0;
@@ -42,4 +42,14 @@ char *getTile(unsigned char value, int *info) {
         info[1] = 1;
         return ".";
     }
+}
+
+void pMove (int x, int y){
+    if(playery + y > mapY || playery - y < 0) return;
+    if(playerx + x > mapX || playerx - x < 0) return;
+    int info[2];
+    getTile(map[playery+y][playerx+x], info);
+    if(!info[1]) return;
+    playerx+=x;
+    playery+=y;
 }

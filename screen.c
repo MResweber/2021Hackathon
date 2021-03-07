@@ -7,7 +7,10 @@
 #include "mapFactory.h"
 #include "game.h"
 
-#define MAP_SIZE 20
+#define MAP_SIZE_X 1000
+#define MAP_SIZE_Y 500
+#define WINDOW_X 100
+#define WINDOW_Y 25
 
 void createColors(){
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
@@ -52,7 +55,7 @@ char startScreen(){
             current--;
             if (current < 0) current = 2;
         }
-        if(input == '5' || input == KEY_BREAK) {
+        if(input == '5' || input == KEY_ENTER) {
             if (current == 0) return 'n';
             if (current == 1) return 'h';
             if (current == 2) {
@@ -65,7 +68,7 @@ char startScreen(){
 
 char creatorScreen(){
     WINDOW *cWin;
-    cWin = newwin(50, 50, 0, 0);
+    cWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
     int input;
     int current = 0;
     while (1) {
@@ -90,7 +93,7 @@ char creatorScreen(){
             player *p = malloc(sizeof(player));
             p->hp = 10;
             p->sta = 10;
-            initGame(p, MAP_SIZE, MAP_SIZE);
+            initGame(p, MAP_SIZE_X, MAP_SIZE_Y);
             delwin(cWin);
             return 'g';
         }
@@ -102,7 +105,7 @@ char creatorScreen(){
 
 char helpScreen(){
     WINDOW *hWin;
-    hWin = newwin(50, 50, 0, 0);
+    hWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
     int input;
     while (1) {
         wclear(hWin);
@@ -121,20 +124,20 @@ char helpScreen(){
 char gameScreen(){
     while(1){
         WINDOW *gWin;
-        gWin = newwin(50, 50, 0, 0);
+        gWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
         unsigned char **map = getMap();
+        int *playerPos = getPlayerPos();
         wclear(gWin);
 
-        for(int y = 0; y < MAP_SIZE; y++) {
-            for(int x = 0; x < MAP_SIZE; x++){
-                int *color;
+        for(int y = 0; y < MAP_SIZE_Y; y++) {
+            for(int x = 0; x < MAP_SIZE_X; x++){
+                int color[2];
                 char *tile = getTile(map[y][x], color);
                 wattron(gWin, COLOR_PAIR(color[0]));
                 mvwprintw(gWin, y, x, tile);
                 wattroff(gWin, COLOR_PAIR(color[0]));
             }
         }
-        int *playerPos = getPlayerPos();
         mvwprintw(gWin, playerPos[1], playerPos[0], "@");
         wrefresh(gWin);
 
@@ -143,5 +146,13 @@ char gameScreen(){
             delwin(gWin);
             return 's';
         }
+        else if (input == '2') pMove(0, 1);   // down
+        else if (input == '3') pMove(1, 1);   // down right
+        else if (input == '1') pMove(-1, 1);  // down left
+        else if (input == '8') pMove(0, -1);  // up
+        else if (input == '9') pMove(1, -1);  // up right
+        else if (input == '7') pMove(-1, -1); // up left
+        else if (input == '6') pMove(1, 0);   // right
+        else if (input == '4') pMove(-1, 0);  // left
     }
 }
