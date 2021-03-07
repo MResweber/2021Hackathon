@@ -1,3 +1,4 @@
+void createColors();
 void initScreen();
 char startScreen();
 char helpScreen();
