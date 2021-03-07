@@ -4,13 +4,50 @@
 #include <unistd.h>
 #include <ncurses.h>
 
-#include "mapFactory.h"
+//#include "mapFactory.h"
+#include "screen.h"
 #include "game.h"
+#include "text.h"
 
 #define MAP_SIZE_X 150
 #define MAP_SIZE_Y 50
 #define WINDOW_X 75 //should alwats be odd
 #define WINDOW_Y 25 
+
+int main(int argc, char** argv) {
+    char state = 's';
+    initScreen();
+
+    while(1) {
+        switch (state){
+        case 's':
+            state = startScreen();
+            break;
+        
+        case 'n': 
+            state = creatorScreen();
+            break;
+        
+        case 'h': 
+            state = helpScreen();
+            break;
+        
+        case 'g': 
+            state = gameScreen();
+            break;
+        
+        case 'v': 
+            state = victoryScreen();
+            break;
+
+        case 'e':
+            exit(0);
+
+        default:
+            break;
+        }
+    }
+}
 
 void createColors(){
     init_color(COLOR_GREEN, 0, 300, 0);
@@ -39,7 +76,7 @@ char startScreen(){
     while (1) {
     
         clear();
-        mvprintw (0, 0, "Delver");
+        mvprintw (0, 0, "The Forest of Iliath");
         mvprintw (2, 0, "New Game");
         mvprintw (3, 0, "Help");
         mvprintw (4, 0, "Exit");
@@ -79,13 +116,13 @@ char creatorScreen(){
     int current = 0;
     while (1) {
         wclear(cWin);
-        mvwprintw(cWin, 0, 0, "TODO Creator Screen");
-        mvwprintw(cWin, 2, 0, "Back");
-        mvwprintw(cWin, 2, 5, "Play");
+        mvwprintw(cWin, 0, 0, INTRO);
+        mvwprintw(cWin, 6, 0, "Back");
+        mvwprintw(cWin, 6, 5, "Play");
 
         wattron(cWin, COLOR_PAIR(2));
-        if(current == 0) mvwprintw(cWin, 2, 0, "Back");
-        else mvwprintw(cWin, 2, 5, "Play");
+        if(current == 0) mvwprintw(cWin, 6, 0, "Back");
+        else mvwprintw(cWin, 6, 5, "Play");
         wattroff(cWin, COLOR_PAIR(2));
 
         wrefresh(cWin);
@@ -112,7 +149,7 @@ char helpScreen(){
     int input;
     while (1) {
         wclear(hWin);
-        mvwprintw(hWin, 0, 0, "TODO Tutorial");
+        mvwprintw(hWin, 0, 0, TUTORIAL);
         wrefresh(hWin);
 
         input = wgetch(hWin);
@@ -180,11 +217,14 @@ char gameScreen(){
             }
         }
 
+        //Place Player Token
         int playerTokenx = xIncrement+leftDif+rightDif;
         int playerTokeny = yIncrement+topDif+bottomDif;
         wattron(gWin, COLOR_PAIR(5));
         mvwprintw(gWin, playerTokeny, playerTokenx, "@");
         wattroff(gWin, COLOR_PAIR(5));
+
+        //Place Wizards if visible
         for (int i = 1; i < 4; i++){
             int wizardPos[2];
             getPos(i, wizardPos);
@@ -202,6 +242,8 @@ char gameScreen(){
                 }
             }
         }
+
+        //Place Dragon if Visible
         int draPos[2];
         getPos(4, draPos);
         if(draPos[0] - left >= 0 && draPos[0] - right < right &&
@@ -250,6 +292,20 @@ char gameScreen(){
     }
 }
 
-char victoryScreen() {
-    return 's';
+char victoryScreen(){
+    WINDOW *vWin;
+    vWin = newwin(WINDOW_Y, WINDOW_X, 0, 0);
+    int input;
+    while (1) {
+        wclear(vWin);
+        mvwprintw(vWin, 0, 0, VICTORY);
+        wrefresh(vWin);
+
+        input = wgetch(vWin);
+        if(input == '5' || input == 'z') {
+            delwin(vWin);
+            return 's';
+        }
+    }
+    
 }

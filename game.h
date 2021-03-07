@@ -10,3 +10,5 @@ char *getTile(unsigned char value, int info[]);
 char *movec(int c, int x, int y);
 void placeCharacter(int c);
 int getHiFived (int c);
+void createMap(int xMax, int yMax);
+void addTiles(unsigned char type, unsigned char rtype, int chance);

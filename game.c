@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "mapFactory.h"
+//#include "mapFactory.h"
 #include "game.h"
 
 unsigned char **map;
@@ -12,7 +12,7 @@ int mapY;
 void initGame(int x, int y) {
     mapX = x;
     mapY = y;
-    map = createMap(mapX, mapY);
+    createMap(mapX, mapY);
     pc = malloc(sizeof(character) * 5);
     placeCharacter(0);
     for (int i = 1; i < 4; i++) {
@@ -106,6 +106,45 @@ void placeCharacter(int c) {
             pc[c]->xPos = y;
             pc[c]->hiFive = 0;
             placed = 1;
+        }
+    }
+}
+
+void createMap(int xMax, int yMax) {
+    map = malloc(sizeof(unsigned char *) * yMax);
+    for(int y = 0; y < yMax; y++) {
+        map[y] = malloc(sizeof(unsigned char) * xMax);
+        for(int x = 0; x < xMax; x++) {
+            map[y][x] = 1; //Open Ground
+        }
+    }
+    addTiles(3, 1, 5); //add water
+    addTiles(2, 1, 6); //add undergrowth
+}
+
+void addTiles(unsigned char type, unsigned char rtype, int chance) {
+    for (int y = 0; y < mapY; y++) {
+        for(int x = 0; x < mapX; x++) {
+            if (rand() % 10 < chance && map[y][x] == 1) map[y][x] = type;
+        }
+    }
+    for (int i = 0; i < 10; i++) {
+        for (int y = 0; y < mapY; y++) {
+            for(int x = 0; x < mapX; x++) {
+                int count = 0;
+                if (x != 0 && map[y][x-1]  == type) count++; 
+                if (x != mapX-1 && map[y][x+1]  == type) count++; 
+                if (y != 0 && map[y-1][x]  == type) count++; 
+                if (y != mapY-1 && map[y+1][x]  == type) count++; 
+                
+                if (x != 0 && y != 0 && map[y-1][x-1]  == type) count++;
+                if (x != 0 && y != mapY-1 && map[y+1][x-1]  == type) count++;
+                if (x != mapX-1 && y != 0 && map[y-1][x+1]  == type) count++;
+                if (x != mapX-1 && y != mapY-1 && map[y+1][x+1]  == type) count++;
+
+                if (count < 4 && map[y][x] == type) map[y][x] = rtype;
+                if (count > 5 && map[y][x] == 1) map[y][x] = type;
+            }
         }
     }
 }
