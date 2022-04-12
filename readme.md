@@ -1,2 +1,2 @@
 #The Forest of Iliath
-A simple roguelike osrt of thing. I made for a hackathon. 
+A simple roguelike sort of thing. I made for a hackathon. 
